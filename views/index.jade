@@ -1,0 +1,63 @@
+extends layout
+
+block content
+  h1= title
+  p A must have app for any business :)
+
+  div(ng-controller="jobsController")
+    h3 There are {{jobs.length}} jobs in total
+    accordion(close-other="true", ng-model="jobs")
+      accordion-group(ng-repeat="job in jobs", heading="{{job.title}}")
+        p {{ job.title }} 
+          button(ng-click="destroy(job.id)") (destroy)
+        p {{ job.begin }}
+        p {{ job.end }}
+        p {{ job.urgency }}
+        p {{ job.state }}
+
+    h3 Create a new job
+    div(ng-controller="formController")
+      form(novalidate)
+        p Title
+          input(type="text", ng-model='newJob.title', required)
+        p Data de inceput
+          input(type="text", ng-model="newJob.begin")
+        p Data de final
+          input(type="text", ng-model="newJob.end")
+        p Urgentism
+          select
+            each val in [1,2,3,4,5]
+              option(ng-model="newJob.urgency", value=val)= val
+          input(type='submit', ng-click="update(newJob)", value="submit")
+
+
+  h2 Creating a new job
+  form(action="/jobs/create", method="post")
+    input(type="text", name="title")
+    input(type="submit")
+
+  h2 Users
+
+  ul
+  each job in jobs
+    li
+      = job.title
+      | &nbsp;
+      | (
+      a(href="/jobs/" + job.id + "/destroy") Destroy
+      | )
+      ul
+        li
+          | Creating a new task:
+          form(action="/jobs/" + job.id + "/tasks/create", method="post", style="display: inline")
+            input(type="text", name="title")
+            input(type="submit")
+        each task in job.Tasks
+          li
+            = task.title
+            | &nbsp;
+            | (
+            a(href="/jobs/" + job.id + "/tasks/" + task.id + "/destroy") Destroy
+            | )
+
+  
